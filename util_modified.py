@@ -54,6 +54,10 @@ def doTFIDF(data, mindf):
     m_train_tfidf = tfidf_transformer.fit_transform(m)
     return m_train_tfidf
 
+def cluster_kmean(data):
+    km = KMeans(n_clusters=2, random_state=0, n_init=50, max_iter=500).fit(data)
+    return km
+
 
 def test_stem_count_vectorize():
     test_string = ["Hello, Google. But I can't answer this call go going goes bowl bowls bowled!"]
