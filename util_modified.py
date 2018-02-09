@@ -1,16 +1,10 @@
 
-# coding: utf-8
-
-# In[8]:
-
-
 import string
 from sklearn.feature_extraction.text import *
 from sklearn.naive_bayes import MultinomialNB, GaussianNB
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.decomposition import NMF, TruncatedSVD
 import nltk
-from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import RegexpTokenizer
 
 from sklearn.metrics import confusion_matrix
@@ -49,19 +43,13 @@ class SparseToDenseArray(BaseEstimator, TransformerMixin):
         return self
 
 
-def stem_and_tokenize(doc):
-    exclude = set(string.punctuation)
-    no_punctuation = ''.join(ch for ch in doc if ch not in exclude)
-    tokenizer = RegexpTokenizer("[\w']+")
-    tokens = tokenizer.tokenize(no_punctuation)
-    stemmer = SnowballStemmer("english", ignore_stopwords=True)
-    return [stemmer.stem(t) for t in tokens]
+
 
 tfidf_transformer = TfidfTransformer(sublinear_tf=True, smooth_idf=False, use_idf=True)
 
 
 def doTFIDF(data, mindf):
-    vectorizer = CountVectorizer(min_df=mindf, stop_words=ENGLISH_STOP_WORDS, tokenizer=stem_and_tokenize)
+    vectorizer = CountVectorizer(min_df=mindf, stop_words=ENGLISH_STOP_WORDS)
     m = vectorizer.fit_transform(data)
     m_train_tfidf = tfidf_transformer.fit_transform(m)
     return m_train_tfidf
@@ -119,37 +107,4 @@ def analyze(label, prob, predict, classes, n):
         print("precision: ", precision_score(label, predict, average='weighted'))
     return
 
-
-# In[11]:
-
-
-from sklearn.datasets import fetch_20newsgroups
-comp_tech_subclasses = ['comp.graphics', 
-                        'comp.os.ms-windows.misc', 
-                        'comp.sys.ibm.pc.hardware', 
-                        'comp.sys.mac.hardware']
-                        
-rec_act_subclasses = ['rec.autos', 
-                      'rec.motorcycles', 
-                      'rec.sport.baseball', 
-                      'rec.sport.hockey']
-train_data = fetch_20newsgroups(subset='train', categories=comp_tech_subclasses+rec_act_subclasses, shuffle=True, random_state=42)
-test_data = fetch_20newsgroups(subset='test', categories=comp_tech_subclasses+rec_act_subclasses, shuffle=True, random_state=42)
-
-
-# In[12]:
-
-
-from timeit import default_timer as timer
-
-logging.info("Problem a")
-start = timer()
-X_train_tfidf = doTFIDF(train_data.data, MIN_DF)
-print("With min_df = %d , (training documents, terms extracted): " % MIN_DF, X_train_tfidf.shape)
-
-
-
-duration = timer() - start
-logging.debug("Computation Time in secs: %d" % duration)
-logging.info("finished Problem b")
 
