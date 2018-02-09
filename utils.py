@@ -27,7 +27,7 @@ except (RuntimeError):
 '''
 
 # globals
-MIN_DF = 2
+MIN_DF = 3
 
 
 class SparseToDenseArray(BaseEstimator, TransformerMixin):
