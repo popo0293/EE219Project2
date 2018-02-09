@@ -16,6 +16,8 @@ from sklearn.metrics import auc
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
+from sklearn.cluster import KMeans, MiniBatchKMeans
+from sklearn.metrics.cluster import homogeneity_score,completeness_score, adjusted_rand_score, adjusted_mutual_info_score
 
 '''
 try:
