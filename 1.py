@@ -1,4 +1,8 @@
 from sklearn.datasets import fetch_20newsgroups
+from util_modified import *
+from global_data import *
+
+'''
 comp_tech_subclasses = ['comp.graphics', 
                         'comp.os.ms-windows.misc', 
                         'comp.sys.ibm.pc.hardware', 
@@ -10,8 +14,7 @@ rec_act_subclasses = ['rec.autos',
                       'rec.sport.hockey']
 train_data = fetch_20newsgroups(subset='train', categories=comp_tech_subclasses+rec_act_subclasses, shuffle=True, random_state=42)
 test_data = fetch_20newsgroups(subset='test', categories=comp_tech_subclasses+rec_act_subclasses, shuffle=True, random_state=42)
-
-
+'''
 
 
 from timeit import default_timer as timer
