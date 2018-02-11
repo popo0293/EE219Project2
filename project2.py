@@ -21,7 +21,15 @@ from timeit import default_timer as timer
 
 logging.info("Problem 1")
 start = timer()
-X_train_tfidf = doTFIDF(train_data.data, MIN_DF)
+
+X_train_tfidf = None
+if os.path.isfile("./train_tfidf.pkl"):
+    logging.info("Loading tfidf vector.")
+    X_train_tfidf = pickle.load(open("./train_tfidf.pkl", "rb"))
+else:
+    X_train_tfidf = doTFIDF(train_data.data, MIN_DF)
+    pickle.dump(X_train_tfidf, open( "./train_tfidf.pkl", "wb"))
+
 print("With min_df = %d , (training documents, terms extracted): " % MIN_DF, X_train_tfidf.shape)
 
 duration = timer() - start
