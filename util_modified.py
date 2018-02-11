@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import itertools
 from sklearn.cluster import KMeans, MiniBatchKMeans
-from sklearn.metrics.cluster import homogeneity_score,completeness_score, adjusted_rand_score, adjusted_mutual_info_score
-from scipy.sparse.linalg import svds
+from sklearn.metrics.cluster import *
+
 from sklearn.preprocessing import Normalizer
 from sklearn.pipeline import make_pipeline
 
@@ -53,7 +53,8 @@ def doTFIDF(data, mindf):
 
 def cluster_kmean(data, n):
     km = KMeans(n_clusters=n, max_iter=100, verbose=False, random_state=42).fit(data)
-    return km
+    pred = km.predict(data)
+    return pred
 
 
 def test_stem_count_vectorize():
@@ -65,9 +66,9 @@ def test_stem_count_vectorize():
     print(X.toarray())
 
 
-def report_stats(label, predict, classes, display=True):
+def report_stats(label, predict, classes, display=True, msg=None):
     n = len(classes)
-    cmatrix = confusion_matrix(label, predict)
+    cmatrix = contingency_matrix(label, predict)
     if display:
         plt.imshow(cmatrix, interpolation='nearest', cmap=plt.cm.BuGn)
         plt.title("Contingency Table")
@@ -94,14 +95,15 @@ def report_stats(label, predict, classes, display=True):
     adjusted_Rand_Index = adjusted_rand_score(label, predict)
     adjusted_Mutual_Info_Score = adjusted_mutual_info_score(label, predict)
 
-    if display:
-        print("Homogeneity: %0.3f" % homogeneity)
-        print("Completeness: %0.3f" % completeness)
-        print("V-measure: %0.3f" % v_measure)
-        print("Adjusted Rand-Index: %.3f" % adjusted_Rand_Index)
-        print("Adjusted Mutual Info Score: %0.3f" % adjusted_Mutual_Info_Score)
+    if isinstance(msg, str):
+        print(msg)
+    print("Homogeneity: %0.3f" % homogeneity)
+    print("Completeness: %0.3f" % completeness)
+    print("V-measure: %0.3f" % v_measure)
+    print("Adjusted Rand-Index: %.3f" % adjusted_Rand_Index)
+    print("Adjusted Mutual Info Score: %0.3f" % adjusted_Mutual_Info_Score)
 
-    return [homogeneity, completeness, v_measure, adjusted_Rand_Index, adjusted_Mutual_Info_Score]
+    return [cmatrix, [homogeneity, completeness, v_measure, adjusted_Rand_Index, adjusted_Mutual_Info_Score]]
 
 
 def analyze(label, prob, predict, classes, n):

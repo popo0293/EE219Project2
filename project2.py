@@ -33,7 +33,7 @@ else:
     km_pred = cluster_kmean(X_train_tfidf, 2)
     pickle.dump(km_pred, open("./kmean.pkl", "wb"))
 
-report_stats(train_label, km_pred.labels_, CAT)
+report_stats(train_label, km_pred, CAT)
 
 duration = timer() - start
 logging.debug("Computation Time in secs: %d" % duration)
@@ -43,51 +43,70 @@ logging.info("finished Problem 2")
 logging.info("Problem 3")
 start = timer()
 
-ratio = None
-svd = None
 R_MAX = 1000
-if GET_DATA_FROM_FILES and os.path.isfile("./var_ratio.pkl") and os.path.isfile("./svd1000.pkl"):
-    logging.info("Loading explained variance ratio.")
-    ratio = pickle.load(open("./var_ratio.pkl", "rb"))
-    svd = pickle.load(open("./svd1000.pkl", "rb"))
+ratio = None
+if GET_DATA_FROM_FILES and os.path.isfile("./ratio.pkl"):
+    logging.info("Loading ratio.")
+    ratio = pickle.load(open("./ratio.pkl", "rb"))
 else:
     svd = TruncatedSVD(n_components=R_MAX, n_iter=7, random_state=42)
-    X_train_svd = svd.fit_transform(X_train_tfidf)
+    svd.fit_transform(X_train_tfidf)
     ratio = svd.explained_variance_ratio_.cumsum()
-    pickle.dump(ratio, open("./var_ratio.pkl", "wb"))
-    pickle.dump(svd, open("./svd1000.pkl", "wb"))
+    pickle.dump(ratio, open("./ratio.pkl", "wb"), True)
 
 plt.plot(range(R_MAX), ratio, 'r', lw=3, label='Cumulative explained variance ratio')
 plt.ylabel('Cumulative explained variance ratio')
 plt.xlabel('r')
 plt.show()
 
-'''
 r = [1, 2, 3, 5, 10, 20, 50, 100, 300]
+
 y = []
+cmatrix = []
 for i in r:
     svd = TruncatedSVD(n_components=i)
-    normalizer = Normalizer(copy=False)
-    pipeline = make_pipeline(svd, normalizer)
-    X_train_lsi = pipeline.fit_transform(X_train_tfidf)
+    # normalizer = Normalizer(copy=False)
+    # pipeline = make_pipeline(svd, normalizer)
+    # X_train_lsi = pipeline.fit_transform(X_train_tfidf)
+    X_train_lsi = svd.fit_transform(X_train_tfidf)
     kmean = cluster_kmean(X_train_lsi, 2)
-    result = report_stats(train_label, kmean.labels_, CAT, display=False)
-    y.append(result)
+    msg = 'With r = %d' % i
+    result = report_stats(train_label, kmean, CAT, display=False, msg=msg)
+    print("-  "*10)
+    print("The contingency matrix is: ")
+    cmatrix.append(result[0])
+    print(result[0])
+    y.append(result[1])
+    print("-"*30)
 
 y_transpose = np.array(y).T.tolist()
 
-plt.plot(r, y_transpose[0], 'r', lw=6, label='homogenity')
-plt.plot(r, y_transpose[1], 'y', lw=4, label='completeness')
-plt.plot(r, y_transpose[4], 'k', lw=2, label='normalized mutual score')
-plt.plot(r, y_transpose[3], label='rand score')
-plt.ylabel('Singular Value', fontsize = 20)
-plt.xlabel('Index', fontsize = 20)
-plt.title('Top 1000 singular values', fontsize = 20)
-plt.xscale('log')
+r_len = len(r)
+l1, = plt.plot(range(r_len), y_transpose[0], 'r', lw=4, label='homogenity')
+l2, = plt.plot(range(r_len), y_transpose[1], 'g', lw=2, label='completeness')
+l3, = plt.plot(range(r_len), y_transpose[2], 'b', lw=2, label='completeness')
+l4, = plt.plot(range(r_len), y_transpose[3], 'm', lw=2, label='rand index')
+l5, = plt.plot(range(r_len), y_transpose[4], 'k', lw=2, label='adjusted mutual information')
+tick_marks = np.arange(r_len)
+labels = [str(a) for a in r]
+plt.xticks(tick_marks, labels)
+plt.legend(handles=[l1, l2, l3, l4, l5])
+plt.xlabel('r')
 plt.show()
-'''
-'''
+
+best_r = [np.argmax(y_transpose[i]) for i in range(5)]
+print("*"*60)
+bi = np.bincount(best_r).argmax() # best_r_index
+print("The best R value for TruncatedSVD is %d" % r[bi])
+print("The contingency matrix is: ")
+print(cmatrix[bi])
+print("Homogeneity: %0.3f" % y_transpose[0][bi])
+print("Completeness: %0.3f" % y_transpose[1][bi])
+print("V-measure: %0.3f" % y_transpose[2][bi])
+print("Adjusted Rand-Index: %.3f" % y_transpose[3][bi])
+print("Adjusted Mutual Info Score: %0.3f" % y_transpose[4][bi])
+print("*"*60)
+
 duration = timer() - start
 logging.debug("Computation Time in secs: %d" % duration)
 logging.info("finished Problem 3")
-'''

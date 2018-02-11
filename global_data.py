@@ -20,12 +20,12 @@ CAT = ["Computer Technologies", "Recreational Activities"]
 
 logging.info("loading data")
 # all_data = fetch_20newsgroups(subset='all', categories=categories, shuffle=True, random_state=42)
-
 train_data = fetch_20newsgroups(subset='train', categories=categories, shuffle=True, random_state=42)
 test_data = fetch_20newsgroups(subset='test', categories=categories, shuffle=True, random_state=42)
 
 # create labels
 # 0 for computer technology, 1 for recreational activities
+# all_label = [(x//4) for x in all_data.target]
 train_label = [(x//4) for x in train_data.target]
 test_label = [(x//4) for x in test_data.target]
 
