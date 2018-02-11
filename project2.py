@@ -33,7 +33,7 @@ else:
     km_pred = KMeans(n_clusters=2, max_iter=100, verbose=False, random_state=42).fit(X_train_tfidf)
     pickle.dump(km_pred, open("./kmean.pkl", "wb"))
 
-report_stats(train_label, km_pred.labels_)
+report_stats(train_label, km_pred.labels_, CAT)
 
 duration = timer() - start
 logging.debug("Computation Time in secs: %d" % duration)

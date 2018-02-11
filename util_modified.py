@@ -61,12 +61,33 @@ def test_stem_count_vectorize():
     print(X.toarray())
 
 
-def report_stats(target, predicted):
-    homogeneity = homogeneity_score(target, predicted)
-    completeness = completeness_score(target, predicted)
-    v_measure = v_measure_score(target, predicted)
-    adjusted_Rand_Index = adjusted_rand_score(target, predicted)
-    adjusted_Mutual_Info_Score = adjusted_mutual_info_score(target, predicted)
+def report_stats(label, predict, classes):
+    n = len(classes)
+    cmatrix = confusion_matrix(label, predict)
+    plt.imshow(cmatrix, interpolation='nearest', cmap=plt.cm.BuGn)
+    plt.title("Contingency Table")
+    tick_marks = np.arange(n)
+    className = []
+    for i in range(n):
+        className.append(str(i))
+    plt.xticks(tick_marks, className)
+    plt.yticks(tick_marks, classes)
+    fmt = 'd'
+    thresh = cmatrix.max() / 2.
+    for i, j in itertools.product(range(n), range(n)):
+        plt.text(j, i, format(cmatrix[i, j], fmt),
+                horizontalalignment="center",
+                color="white" if cmatrix[i, j] > thresh else "black")
+    plt.tight_layout()
+    plt.ylabel('Ground Truth Label')
+    plt.xlabel('Cluster Label')
+    plt.show()
+
+    homogeneity = homogeneity_score(label, predict)
+    completeness = completeness_score(label, predict)
+    v_measure = v_measure_score(label, predict)
+    adjusted_Rand_Index = adjusted_rand_score(label, predict)
+    adjusted_Mutual_Info_Score = adjusted_mutual_info_score(label, predict)
 
     print("Homogeneity: %0.3f" % homogeneity)
     print("Completeness: %0.3f" % completeness)
