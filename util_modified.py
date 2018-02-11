@@ -13,6 +13,7 @@ import numpy as np
 import itertools
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.metrics.cluster import homogeneity_score,completeness_score, adjusted_rand_score, adjusted_mutual_info_score
+from scipy.sparse.linalg import svds
 
 '''
 try:
@@ -47,8 +48,9 @@ def doTFIDF(data, mindf):
     m_train_tfidf = tfidf_transformer.fit_transform(m)
     return m_train_tfidf
 
+
 def cluster_kmean(data):
-    km = KMeans(n_clusters=2, random_state=0, n_init=50, max_iter=500).fit(data)
+    km = KMeans(n_clusters=2, max_iter=100, verbose=False, random_state=42).fit(data)
     return km
 
 
