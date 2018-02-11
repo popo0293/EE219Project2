@@ -21,4 +21,4 @@ There are two ways to run the code
 
 ### Results
 A webpage snapshot is also provided:
->* *ee219_project2_results.png*
+>* *ee219_project2_results.pdf*

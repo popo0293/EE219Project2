@@ -43,13 +43,11 @@ class SparseToDenseArray(BaseEstimator, TransformerMixin):
         return self
 
 
+tfidf_transformer = TfidfTransformer(smooth_idf=False)
 
 
-tfidf_transformer = TfidfTransformer(sublinear_tf=True, smooth_idf=False, use_idf=True)
-
-
-def doTFIDF(data, mindf):
-    vectorizer = CountVectorizer(min_df=mindf, stop_words=ENGLISH_STOP_WORDS)
+def doTFIDF(data):
+    vectorizer = CountVectorizer(min_df=MIN_DF, stop_words=ENGLISH_STOP_WORDS)
     m = vectorizer.fit_transform(data)
     m_train_tfidf = tfidf_transformer.fit_transform(m)
     return m_train_tfidf
