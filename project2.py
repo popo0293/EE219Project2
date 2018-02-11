@@ -1,29 +1,15 @@
-from sklearn.datasets import fetch_20newsgroups
 from util_modified import *
 from global_data import *
 
-'''
-comp_tech_subclasses = ['comp.graphics', 
-                        'comp.os.ms-windows.misc', 
-                        'comp.sys.ibm.pc.hardware', 
-                        'comp.sys.mac.hardware']
-                        
-rec_act_subclasses = ['rec.autos', 
-                      'rec.motorcycles', 
-                      'rec.sport.baseball', 
-                      'rec.sport.hockey']
-train_data = fetch_20newsgroups(subset='train', categories=comp_tech_subclasses+rec_act_subclasses, shuffle=True, random_state=42)
-test_data = fetch_20newsgroups(subset='test', categories=comp_tech_subclasses+rec_act_subclasses, shuffle=True, random_state=42)
-'''
-
-
 from timeit import default_timer as timer
+
+GET_DATA_FROM_FILES = True
 
 logging.info("Problem 1")
 start = timer()
 
 X_train_tfidf = None
-if os.path.isfile("./train_tfidf.pkl"):
+if GET_DATA_FROM_FILES and os.path.isfile("./train_tfidf.pkl"):
     logging.info("Loading tfidf vector.")
     X_train_tfidf = pickle.load(open("./train_tfidf.pkl", "rb"))
 else:
@@ -39,7 +25,15 @@ logging.info("finished Problem 1")
 logging.info("Problem 2")
 start = timer()
 
+km_pred = None
+if GET_DATA_FROM_FILES and os.path.isfile("./kmean.pkl"):
+    logging.info("Loading predicted kmean.")
+    km_pred = pickle.load(open("./kmean.pkl", "rb"))
+else:
+    km_pred = KMeans(n_clusters=2, max_iter=100, verbose=False, random_state=42).fit(X_train_tfidf)
+    pickle.dump(km_pred, open("./kmean.pkl", "wb"))
 
+report_stats(train_label, km_pred.labels_)
 
 duration = timer() - start
 logging.debug("Computation Time in secs: %d" % duration)

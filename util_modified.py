@@ -7,12 +7,7 @@ from sklearn.decomposition import NMF, TruncatedSVD
 import nltk
 from nltk.tokenize import RegexpTokenizer
 
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import precision_score
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import roc_curve
-from sklearn.metrics import auc
+from sklearn.metrics import *
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
@@ -64,6 +59,21 @@ def test_stem_count_vectorize():
     feature_name = vectorizer.get_feature_names()
     print(feature_name)
     print(X.toarray())
+
+
+def report_stats(target, predicted):
+    homogeneity = homogeneity_score(target, predicted)
+    completeness = completeness_score(target, predicted)
+    v_measure = v_measure_score(target, predicted)
+    adjusted_Rand_Index = adjusted_rand_score(target, predicted)
+    adjusted_Mutual_Info_Score = adjusted_mutual_info_score(target, predicted)
+
+    print("Homogeneity: %0.3f" % homogeneity)
+    print("Completeness: %0.3f" % completeness)
+    print("V-measure: %0.3f" % v_measure)
+    print("Adjusted Rand-Index: %.3f" % adjusted_Rand_Index)
+    print("Adjusted Mutual Info Score: %0.3f" % adjusted_Mutual_Info_Score)
+    return homogeneity, completeness, v_measure, adjusted_Rand_Index, adjusted_Mutual_Info_Score
 
 
 def analyze(label, prob, predict, classes, n):
