@@ -19,14 +19,20 @@ test_data = fetch_20newsgroups(subset='test', categories=comp_tech_subclasses+re
 
 from timeit import default_timer as timer
 
-logging.info("Problem a")
+logging.info("Problem 1")
 start = timer()
 X_train_tfidf = doTFIDF(train_data.data, MIN_DF)
 print("With min_df = %d , (training documents, terms extracted): " % MIN_DF, X_train_tfidf.shape)
+
+duration = timer() - start
+logging.debug("Computation Time in secs: %d" % duration)
+logging.info("finished Problem 1")
+
+logging.info("Problem 2")
+start = timer()
 
 
 
 duration = timer() - start
 logging.debug("Computation Time in secs: %d" % duration)
-logging.info("finished Problem b")
-
+logging.info("finished Problem 2")
