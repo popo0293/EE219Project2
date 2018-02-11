@@ -3,7 +3,7 @@ import string
 from sklearn.feature_extraction.text import *
 from sklearn.naive_bayes import MultinomialNB, GaussianNB
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.decomposition import NMF, TruncatedSVD
+from sklearn.decomposition import NMF, TruncatedSVD, PCA
 import nltk
 from nltk.tokenize import RegexpTokenizer
 
@@ -14,6 +14,8 @@ import itertools
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.metrics.cluster import homogeneity_score,completeness_score, adjusted_rand_score, adjusted_mutual_info_score
 from scipy.sparse.linalg import svds
+from sklearn.preprocessing import Normalizer
+from sklearn.pipeline import make_pipeline
 
 '''
 try:
@@ -49,8 +51,8 @@ def doTFIDF(data, mindf):
     return m_train_tfidf
 
 
-def cluster_kmean(data):
-    km = KMeans(n_clusters=2, max_iter=100, verbose=False, random_state=42).fit(data)
+def cluster_kmean(data, n):
+    km = KMeans(n_clusters=n, max_iter=100, verbose=False, random_state=42).fit(data)
     return km
 
 
@@ -63,27 +65,28 @@ def test_stem_count_vectorize():
     print(X.toarray())
 
 
-def report_stats(label, predict, classes):
+def report_stats(label, predict, classes, display=True):
     n = len(classes)
     cmatrix = confusion_matrix(label, predict)
-    plt.imshow(cmatrix, interpolation='nearest', cmap=plt.cm.BuGn)
-    plt.title("Contingency Table")
-    tick_marks = np.arange(n)
-    className = []
-    for i in range(n):
-        className.append(str(i))
-    plt.xticks(tick_marks, className)
-    plt.yticks(tick_marks, classes)
-    fmt = 'd'
-    thresh = cmatrix.max() / 2.
-    for i, j in itertools.product(range(n), range(n)):
-        plt.text(j, i, format(cmatrix[i, j], fmt),
-                horizontalalignment="center",
-                color="white" if cmatrix[i, j] > thresh else "black")
-    plt.tight_layout()
-    plt.ylabel('Ground Truth Label')
-    plt.xlabel('Cluster Label')
-    plt.show()
+    if display:
+        plt.imshow(cmatrix, interpolation='nearest', cmap=plt.cm.BuGn)
+        plt.title("Contingency Table")
+        tick_marks = np.arange(n)
+        className = []
+        for i in range(n):
+            className.append(str(i))
+        plt.xticks(tick_marks, className)
+        plt.yticks(tick_marks, classes)
+        fmt = 'd'
+        thresh = cmatrix.max() / 2.
+        for i, j in itertools.product(range(n), range(n)):
+            plt.text(j, i, format(cmatrix[i, j], fmt),
+                    horizontalalignment="center",
+                    color="white" if cmatrix[i, j] > thresh else "black")
+        plt.tight_layout()
+        plt.ylabel('Ground Truth Label')
+        plt.xlabel('Cluster Label')
+        plt.show()
 
     homogeneity = homogeneity_score(label, predict)
     completeness = completeness_score(label, predict)
@@ -91,12 +94,14 @@ def report_stats(label, predict, classes):
     adjusted_Rand_Index = adjusted_rand_score(label, predict)
     adjusted_Mutual_Info_Score = adjusted_mutual_info_score(label, predict)
 
-    print("Homogeneity: %0.3f" % homogeneity)
-    print("Completeness: %0.3f" % completeness)
-    print("V-measure: %0.3f" % v_measure)
-    print("Adjusted Rand-Index: %.3f" % adjusted_Rand_Index)
-    print("Adjusted Mutual Info Score: %0.3f" % adjusted_Mutual_Info_Score)
-    return homogeneity, completeness, v_measure, adjusted_Rand_Index, adjusted_Mutual_Info_Score
+    if display:
+        print("Homogeneity: %0.3f" % homogeneity)
+        print("Completeness: %0.3f" % completeness)
+        print("V-measure: %0.3f" % v_measure)
+        print("Adjusted Rand-Index: %.3f" % adjusted_Rand_Index)
+        print("Adjusted Mutual Info Score: %0.3f" % adjusted_Mutual_Info_Score)
+
+    return [homogeneity, completeness, v_measure, adjusted_Rand_Index, adjusted_Mutual_Info_Score]
 
 
 def analyze(label, prob, predict, classes, n):
