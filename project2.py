@@ -64,13 +64,13 @@ r = [1, 2, 3, 5, 10, 20, 50, 100, 300]
 y = []
 cmatrix = []
 for i in r:
-    svd = TruncatedSVD(n_components=i)
+    svd = TruncatedSVD(n_components=i, random_state=0)
     # normalizer = Normalizer(copy=False)
     # pipeline = make_pipeline(svd, normalizer)
     # X_train_lsi = pipeline.fit_transform(X_train_tfidf)
     X_train_lsi = svd.fit_transform(X_train_tfidf)
     kmean = cluster_kmean(X_train_lsi, 2)
-    msg = 'With r = %d' % i
+    msg = 'With r = %d' % i + " Using LSI"
     result = report_stats(train_label, kmean, CAT, display=False, msg=msg)
     print("-  "*10)
     print("The contingency matrix is: ")
@@ -98,6 +98,54 @@ best_r = [np.argmax(y_transpose[i]) for i in range(5)]
 print("*"*60)
 bi = np.bincount(best_r).argmax() # best_r_index
 print("The best R value for TruncatedSVD is %d" % r[bi])
+print("The contingency matrix is: ")
+print(cmatrix[bi])
+print("Homogeneity: %0.3f" % y_transpose[0][bi])
+print("Completeness: %0.3f" % y_transpose[1][bi])
+print("V-measure: %0.3f" % y_transpose[2][bi])
+print("Adjusted Rand-Index: %.3f" % y_transpose[3][bi])
+print("Adjusted Mutual Info Score: %0.3f" % y_transpose[4][bi])
+print("*"*60)
+
+
+# NMF
+y = []
+cmatrix = []
+for i in r:
+    svd = NMF(n_components=i)
+    # normalizer = Normalizer(copy=False)
+    # pipeline = make_pipeline(svd, normalizer)
+    # X_train_lsi = pipeline.fit_transform(X_train_tfidf)
+    X_train_nmf = svd.fit_transform(X_train_tfidf)
+    kmean = cluster_kmean(X_train_nmf, 2)
+    msg = 'With r = %d' % i + " Using NMF"
+    result = report_stats(train_label, kmean, CAT, display=False, msg=msg)
+    print("-  "*10)
+    print("The contingency matrix is: ")
+    cmatrix.append(result[0])
+    print(result[0])
+    y.append(result[1])
+    print("-"*30)
+
+y_transpose = np.array(y).T.tolist()
+
+r_len = len(r)
+l1, = plt.plot(range(r_len), y_transpose[0], 'r', lw=4, label='homogenity')
+l2, = plt.plot(range(r_len), y_transpose[1], 'g', lw=2, label='completeness')
+l3, = plt.plot(range(r_len), y_transpose[2], 'b', lw=2, label='completeness')
+l4, = plt.plot(range(r_len), y_transpose[3], 'm', lw=2, label='rand index')
+l5, = plt.plot(range(r_len), y_transpose[4], 'k', lw=2, label='adjusted mutual information')
+tick_marks = np.arange(r_len)
+labels = [str(a) for a in r]
+plt.xticks(tick_marks, labels)
+plt.legend(handles=[l1, l2, l3, l4, l5])
+plt.xlabel('r')
+plt.show()
+
+best_r = [np.argmax(y_transpose[i]) for i in range(5)]
+print("*"*60)
+bi = np.bincount(best_r).argmax() # best_r_index
+print("The best R value for NMF is %d" % r[bi])
 print("The contingency matrix is: ")
 print(cmatrix[bi])
 print("Homogeneity: %0.3f" % y_transpose[0][bi])
