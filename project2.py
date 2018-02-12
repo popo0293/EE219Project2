@@ -4,6 +4,7 @@ from global_data import *
 from timeit import default_timer as timer
 
 GET_DATA_FROM_FILES = True
+DETAILS = False
 
 logging.info("Problem 1")
 start = timer()
@@ -61,23 +62,36 @@ plt.show()
 
 r = [1, 2, 3, 5, 10, 20, 50, 100, 300]
 
-y = []
-cmatrix = []
-for i in r:
-    svd = TruncatedSVD(n_components=i, random_state=0)
-    # normalizer = Normalizer(copy=False)
-    # pipeline = make_pipeline(svd, normalizer)
-    # X_train_lsi = pipeline.fit_transform(X_train_tfidf)
-    X_train_lsi = svd.fit_transform(X_train_tfidf)
-    kmean = cluster_kmean(X_train_lsi, 2)
-    msg = 'With r = %d' % i + " Using LSI"
-    result = report_stats(train_label, kmean, CAT, display=False, msg=msg)
-    print("-  "*10)
-    print("The contingency matrix is: ")
-    cmatrix.append(result[0])
-    print(result[0])
-    y.append(result[1])
-    print("-"*30)
+# LSI
+y = None
+cmatrix = None
+if GET_DATA_FROM_FILES and not DETAILS \
+        and os.path.isfile("./y_lsi.pkl") \
+        and os.path.isfile("./cmatrix_lsi.pkl"):
+    logging.info("Loading y and cmatrix for LSI.")
+    y = pickle.load(open("./y_lsi.pkl", "rb"))
+    cmatrix = pickle.load(open("./cmatrix_lsi.pkl", "rb"))
+else:
+    y = []
+    cmatrix = []
+    for i in r:
+        svd = TruncatedSVD(n_components=i, random_state=None)
+        # normalizer = Normalizer(copy=False)
+        # pipeline = make_pipeline(svd, normalizer)
+        # X_train_lsi = pipeline.fit_transform(X_train_tfidf)
+        X_train_lsi = svd.fit_transform(X_train_tfidf)
+        kmean = cluster_kmean(X_train_lsi, 2)
+        msg = 'With r = %d' % i + " Using LSI"
+        result = report_stats(train_label, kmean, CAT, display=False, msg=msg)
+        print("-  "*10)
+        print("The contingency matrix is: ")
+        cmatrix.append(result[0])
+        print(result[0])
+        y.append(result[1])
+        print("-"*30)
+
+    pickle.dump(y, open("./y_lsi.pkl", "wb"), True)
+    pickle.dump(cmatrix, open("./cmatrix_lsi.pkl", "wb"), True)
 
 y_transpose = np.array(y).T.tolist()
 
@@ -109,23 +123,32 @@ print("*"*60)
 
 
 # NMF
-y = []
-cmatrix = []
-for i in r:
-    svd = NMF(n_components=i)
-    # normalizer = Normalizer(copy=False)
-    # pipeline = make_pipeline(svd, normalizer)
-    # X_train_lsi = pipeline.fit_transform(X_train_tfidf)
-    X_train_nmf = svd.fit_transform(X_train_tfidf)
-    kmean = cluster_kmean(X_train_nmf, 2)
-    msg = 'With r = %d' % i + " Using NMF"
-    result = report_stats(train_label, kmean, CAT, display=False, msg=msg)
-    print("-  "*10)
-    print("The contingency matrix is: ")
-    cmatrix.append(result[0])
-    print(result[0])
-    y.append(result[1])
-    print("-"*30)
+if GET_DATA_FROM_FILES and not DETAILS \
+        and os.path.isfile("./y_nmf.pkl") \
+        and os.path.isfile("./cmatrix_nmf.pkl"):
+    logging.info("Loading y and cmatrix for NMF.")
+    y = pickle.load(open("./y_nmf.pkl", "rb"))
+    cmatrix = pickle.load(open("./cmatrix_nmf.pkl", "rb"))
+else:
+    y = []
+    cmatrix = []
+    for i in r:
+        svd = NMF(n_components=i)
+        # normalizer = Normalizer(copy=False)
+        # pipeline = make_pipeline(svd, normalizer)
+        # X_train_lsi = pipeline.fit_transform(X_train_tfidf)
+        X_train_nmf = svd.fit_transform(X_train_tfidf)
+        kmean = cluster_kmean(X_train_nmf, 2)
+        msg = 'With r = %d' % i + " Using NMF"
+        result = report_stats(train_label, kmean, CAT, display=False, msg=msg)
+        print("-  "*10)
+        print("The contingency matrix is: ")
+        cmatrix.append(result[0])
+        print(result[0])
+        y.append(result[1])
+        print("-"*30)
+    pickle.dump(y, open("./y_nmf.pkl", "wb"), True)
+    pickle.dump(cmatrix, open("./cmatrix_nmf.pkl", "wb"), True)
 
 y_transpose = np.array(y).T.tolist()
 
