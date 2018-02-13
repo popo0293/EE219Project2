@@ -33,3 +33,8 @@ Or you may directly open *project2.ipynb* on github
 
 The pdf version cuts off some of the codes, but good for graphs
 > *project2.pdf*
+
+#### Report
+A word version and a pdf version is provided:
+> * *pj2_report.docx*
+> * *pj2_report.pdf*
