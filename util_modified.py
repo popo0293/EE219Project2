@@ -57,15 +57,6 @@ def cluster_kmean(data, n):
     return pred
 
 
-def test_stem_count_vectorize():
-    test_string = ["Hello, Google. But I can't answer this call go going goes bowl bowls bowled!"]
-    vectorizer = CountVectorizer(stop_words=ENGLISH_STOP_WORDS, tokenizer=stem_and_tokenize)
-    X = vectorizer.fit_transform(test_string)
-    feature_name = vectorizer.get_feature_names()
-    print(feature_name)
-    print(X.toarray())
-
-
 def report_stats(label, predict, classes, display=True, msg=None):
     n = len(classes)
     cmatrix = contingency_matrix(label, predict)
@@ -105,48 +96,5 @@ def report_stats(label, predict, classes, display=True, msg=None):
 
     return [cmatrix, [homogeneity, completeness, v_measure, adjusted_Rand_Index, adjusted_Mutual_Info_Score]]
 
-
-def analyze(label, prob, predict, classes, n):
-    if n <= 2:
-        fpr, tpr, thresholds = roc_curve(label, prob)
-        roc_auc = auc(fpr,tpr)
-        plt.figure()
-        plt.plot(fpr, tpr, color='lightsteelblue',
-                 lw=2, label='AUC (area = %0.2f)' % roc_auc)
-        plt.plot([0, 1], [0, 1], color='deeppink', lw=2, linestyle='--')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic')
-        plt.legend(loc="lower right")
-        plt.show()
-
-    cmatrix = confusion_matrix(label, predict)
-    plt.imshow(cmatrix, interpolation='nearest', cmap=plt.cm.BuGn)
-    plt.title("Confusion Matrix")
-    # plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=25)
-    plt.yticks(tick_marks, classes)
-    fmt = 'd'
-    thresh = cmatrix.max() / 2.
-    for i, j in itertools.product(range(n), range(n)):
-        plt.text(j, i, format(cmatrix[i, j], fmt),
-                horizontalalignment="center",
-                color="white" if cmatrix[i, j] > thresh else "black")
-    plt.tight_layout()
-    plt.ylabel('True')
-    plt.xlabel('Predicted')
-    plt.show()
-
-    print("accuracy: ", accuracy_score(label, predict))
-    if n <= 2:
-        print("recall: ", recall_score(label, predict))
-        print("precision: ", precision_score(label, predict))
-    else:
-        print("recall: ", recall_score(label, predict, average='weighted'))
-        print("precision: ", precision_score(label, predict, average='weighted'))
-    return
 
 

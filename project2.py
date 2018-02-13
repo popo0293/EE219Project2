@@ -1,3 +1,9 @@
+'''
+This file is an incomplete/old.
+It contains solution to part 1 to part 4.a
+For full solution, see project2.ipynb
+'''
+
 from util_modified import *
 from global_data import *
 
