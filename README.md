@@ -15,10 +15,15 @@ scipy 1.0.0
 matplotlib v2.1.2  
 
 ### How to run
-There are two ways to run the code
-> * Use Jupyter notebook: open *project2.ipynb* and directly execute cells inside the notebook.
-> * Run individual questions directly: e.g. *python a.py*
+Use Jupyter notebook: 
+> * Either run Jupyter notebook locally or go to https://try.jupyter.org/
+> * open *project2.ipynb* and directly execute cells inside the notebook.
+
+Recommend:
+> * in the git repository, precomputed results are saved in pickle files to save your computation time
+> * git clone https://github.com/popo0293/EE219Project2
+
 
 ### Results
 A webpage snapshot is also provided:
->* *ee219_project2_results.pdf*
+> *project2_result.png*
