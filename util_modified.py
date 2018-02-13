@@ -52,7 +52,7 @@ def doTFIDF(data, mindf):
 
 
 def cluster_kmean(data, n):
-    km = KMeans(n_clusters=n, max_iter=100, verbose=False, random_state=42).fit(data)
+    km = KMeans(n_clusters=n, n_init=20, max_iter=100, verbose=False).fit(data)
     pred = km.predict(data)
     return pred
 
